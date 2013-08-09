@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 
 gem 'sinatra'
 gem 'haml'
+gem 'therubyracer'
 gem 'coffee-script'
 
 gem 'activesupport'
