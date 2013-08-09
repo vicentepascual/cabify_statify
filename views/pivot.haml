@@ -1,0 +1,83 @@
+
+%form
+  %p
+    Select type of query:
+  .row
+    .col-4
+      %input#name_general{:type => 'radio', :name => 'name', :value => 'general'}
+      %label{:for => 'name_general'} General
+
+      %input#name_users_evolution{:type => 'radio', :name => 'name', :value => 'users_evolution'}
+      %label{:for => 'name_users_evolution'} Users evolution
+
+      %input#name_users_rides{:type => 'radio', :name => 'name', :value => 'users_rides'}
+      %label{:for => 'name_users_rides'} Users rides
+
+  .row
+    .col-2
+      %label From
+      %input.input-block-level.datepicker{:name => 'start_at'}
+    .col-2
+      %label Upto
+      %input.input-block-level.datepicker{:name => 'end_at'}
+
+  .row
+    .col-4
+      %br
+      %button.btn{:type => 'submit'} GO!
+
+.results{:style => 'display:none;'}
+  #pivotTitle
+    %h2
+      %span.name
+      from
+      %span.start_at
+      to
+      %span.end_at
+  #pivot 
+
+.spinner{:style => 'display:none;'}
+  %img{:src => "/images/ajax-loader.gif"}
+
+:javascript
+  function showPivotTable(result) {
+    $('.spinner').hide();
+
+    if (result['data']) {
+      $('.results').show();
+      var startAt = new moment(result.start_at);
+      var endAt   = new moment(result.end_at);
+      var format  = "Do MMMM YYYY";
+      $('#pivotTitle .name').html(result.name);
+      $('#pivotTitle .start_at').html(startAt.format(format));
+      $('#pivotTitle .end_at').html(endAt.format(format));
+      $('#pivot').pivotUI(result.data);
+    } else {
+      $('form').show();
+      alert("Failed to fetch result data :-(");
+    }
+  }
+
+  $(document).ready(function() {
+    
+    $('form').on('submit', function(e) {
+      e.preventDefault();
+
+      // Empty old data
+      $('#pivot').empty();
+      $('.results').hide();
+      $('.spinner').show();
+      $('form').hide();
+
+      // Peform the query
+      $.ajax({
+        type: "POST",
+        url: "/query",
+        data: $('form').serialize(),
+        dataType: 'json',
+        success: showPivotTable
+      });
+    });
+
+    $('input.datepicker').datepicker({ dateFormat: "yy-mm-dd" });
+  });

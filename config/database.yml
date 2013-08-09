@@ -1,0 +1,2 @@
+development: 'sqlite://database.db'
+production: 'sqlite://database.db'
